@@ -4,8 +4,6 @@ title: About
 permalink: /about/
 ---
 
-This is going to be a data science blog.
+This is a blog about data science, neato visualizations, and interesting computational tidbits. My background is in planetary science, but I ended up falling in love with all things data - so, I am embarking on a journey to become a data scientist at the [Zipfian Academy](http://zipfianacademy.com).
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
-
-You can find the source code for the Jekyll new theme at: [github.com/jglovier/jekyll-new](https://github.com/jglovier/jekyll-new)
+ \- blogging with [jekyll](http://jekyllrb.com/) -
