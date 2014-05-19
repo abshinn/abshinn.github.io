@@ -1,11 +1,12 @@
 # Site settings
 title: Data, you have the bridge
-email: 
+email: adam.b.shinn -at- gmail.com
 username: abshinn
 description: "Data science is pretty freaking awesome."
 baseurl: ""
 url: "http://abshinn.github.io"
 
 # Build settings
-markdown: kramdown
+# markdown: kramdown
+markdown: redcarpet
 permalink: pretty
