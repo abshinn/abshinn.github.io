@@ -9,11 +9,13 @@ Way back during one of my undergraduate astronomy data analysis courses, we brie
 
 Fast forward to the week before I started the Zipfian Academy. In our pre-course work, we were tasked with parsing New York nursing home bed census data using three different approaches: SQLite3, Python, and Shell.
 
+Shell scripting commands can be dense, so I will do my best to break down what each command does in simple English.
+
 Data courtesy of MLB.
 
 ### Converting between tab or space delimited format to a comma delimited format
 
-`stats.tsv` is currently delimited unevenly by spaces. To fix this, how about we remove all spaces and replace it with a single comma. The following command uses `cat` to send all of `stats.tsv` to standard output, then pipe `|` that output to `sed -E`, which takes a "modern" regular expression that finds more than one whitespace `[[:space:]]+` and replaces it with a single comma. Finally, send the resulting output `>` to `stats.csv`.
+`stats.tsv` is currently delimited unevenly by spaces of length two and three. To fix this, how about we remove all spaces and replace it with a single comma. The following command uses `cat` to send all of `stats.tsv` to standard output, then pipe `|` that output to `sed -E`, which takes a "modern" regular expression that finds more than one whitespace `[[:space:]]+` and replaces it with a single comma. Finally, send the resulting output `>` to `stats.csv`.
 
 ```bash
 $ cat stats.tsv | sed -E "s/[[:space:]]+/,/g" > stats.csv
@@ -34,6 +36,8 @@ RK  Last      F.  Team  Pos  G   AB   R   H   2B  3B  HR  RBI  BB  SO  SB  CS  A
 
 ### Count unique teams
 
+`tail +2 stats.csv` will output lines from row 2 to the end of `stats.csv`. In other words, `tail +2` outputs all lines except for the header. `cut -d,` will allow you to select fields from a comma delimited file and `-f4` tells cut to take the 4th column. Finally, `sort` the teams, perform `uniq` to remove similar adjacent lines, and use `wc -l` to count the lines.
+
 ```bash
 $ tail +2 stats.csv | cut -d, -f4 | sort | uniq | wc -l
     15
@@ -41,8 +45,10 @@ $ tail +2 stats.csv | cut -d, -f4 | sort | uniq | wc -l
 
 ### Show only Oakland Athletics players and sort by batting average
 
+`grep OAK` performs a regular expression search with OAK, which returns all of the Athletics players in the list. Finally, `sort` using numeric values `-n`  with a comma delimiter `-t,` starting and ending on field 18 `-k18,18`.
+
 ```bash
-$ grep OAK stats.csv | column -n -t, -k18,18 | column -s, -t
+$ grep OAK stats.csv | sort -n -t, -k18,18 | column -s, -t
 76  Reddick    J  OAK  RF  39  131  18  30  1   3  4   18  10  31  1  0  .229  .289  .374  .663
 24  Callaspo   A  OAK  2B  37  124  14  31  4   0  3   15  21  18  0  0  .250  .359  .355  .713
 51  Cespedes   Y  OAK  LF  39  144  23  37  11  1  7   22  16  28  0  1  .257  .329  .493  .822
