@@ -7,15 +7,15 @@ categories: bash
 
 Way back during one of my undergraduate astronomy data analysis courses, we briefly covered useful shell commands for searching and parsing data such as `grep`, `sed`, and `cut`. At the time I remember thinking that they looked very useful, but without practice I quickly reverted to more familiar and less efficient methods.
 
-Fast forward to the week before I started the Zipfian Academy. In our pre-course work, we were tasked with parsing New York nursing home bed census data using three different approaches: SQLite3, Python, and Shell.
+Fast forward to the week before I started the Zipfian Academy. In our pre-course work, we were tasked with parsing and performing preliminary analysis on New York nursing home bed census data using three different approaches: SQLite3, Python, and Shell. Between the three methods, Shell was by far the shortest and (arguably) most elegant solution. In order to demonstrate some super-useful shell commands, I will use two MLB data sets containing player batting data. 
 
-Shell scripting commands can be dense, so I will do my best to break down what each command does in simple English.
+Shell scripting commands can be dense, so I will do my best to spell out each command in plain English.
 
-Data courtesy of MLB.
+## Current American League Batting Stats
 
 ### Converting between tab or space delimited format to a comma delimited format
 
-`stats.tsv` is currently delimited unevenly by spaces of length two and three. To fix this, how about we remove all spaces and replace it with a single comma. The following command uses `cat` to send all of `stats.tsv` to standard output, then pipe `|` that output to `sed -E`, which takes a "modern" regular expression that finds more than one whitespace `[[:space:]]+` and replaces it with a single comma. Finally, send the resulting output `>` to `stats.csv`.
+`stats.tsv` is currently delimited by whitespace of various lengths. This is not a very useful format. The following command uses `cat` to send all of `stats.tsv` to standard output, then pipe `|` that output to `sed -E`, which takes a "modern" regular expression that finds more than one whitespace `[[:space:]]+` and replaces it with a single comma. Finally, send the resulting output `>` to `stats.csv`.
 
 ```bash
 $ cat stats.tsv | sed -E "s/[[:space:]]+/,/g" > stats.csv
@@ -45,18 +45,79 @@ $ tail +2 stats.csv | cut -d, -f4 | sort | uniq | wc -l
 
 ### Show only Oakland Athletics players and sort by batting average
 
-`grep OAK` performs a regular expression search with OAK, which returns all of the Athletics players in the list. Finally, `sort` using numeric values `-n`  with a comma delimiter `-t,` starting and ending on field 18 `-k18,18`.
+`grep OAK` performs a regular expression search with OAK, which returns all of the Athletics players in the list. Finally, `sort` using numeric values `-n`  with a comma delimiter `-t,` starting and ending on field 18 `-k18,18` in descending order `-r`.
 
 ```bash
-$ grep OAK stats.csv | sort -n -t, -k18,18 | column -s, -t
-76  Reddick    J  OAK  RF  39  131  18  30  1   3  4   18  10  31  1  0  .229  .289  .374  .663
-24  Callaspo   A  OAK  2B  37  124  14  31  4   0  3   15  21  18  0  0  .250  .359  .355  .713
-51  Cespedes   Y  OAK  LF  39  144  23  37  11  1  7   22  16  28  0  1  .257  .329  .493  .822
-20  Lowrie     J  OAK  SS  42  162  24  42  14  0  3   18  22  20  0  0  .259  .360  .401  .761
-29  Donaldson  J  OAK  3B  42  173  34  48  10  1  10  34  19  39  1  0  .277  .351  .520  .871
+$ grep OAK stats.csv | sort -n -t, -k18,18 -r | column -s, -t
 14  Moss       B  OAK  1B  42  143  20  41  8   1  9   36  15  31  1  0  .287  .372  .545  .917
+29  Donaldson  J  OAK  3B  42  173  34  48  10  1  10  34  19  39  1  0  .277  .351  .520  .871
+20  Lowrie     J  OAK  SS  42  162  24  42  14  0  3   18  22  20  0  0  .259  .360  .401  .761
+51  Cespedes   Y  OAK  LF  39  144  23  37  11  1  7   22  16  28  0  1  .257  .329  .493  .822
+24  Callaspo   A  OAK  2B  37  124  14  31  4   0  3   15  21  18  0  0  .250  .359  .355  .713
+76  Reddick    J  OAK  RF  39  131  18  30  1   3  4   18  10  31  1  0  .229  .289  .374  .663
 ``` 
 
-### Find a particular team and display particular columns
+## Baseball Batting History
 
-### Grab a unique team, output to file, find mean avg
+Switching gears, now let us look at a data set containing all MLB batters from 1871 to 2013. Many thanks to the [Lahman Baseball Database](http://www.opensourcesports.com/baseball/) for making the data easily accessible.
+
+### Display batting stats from the 1985 San Francisco Giants
+
+This is easily done with chained `grep` commands. But first, in order to display the header along with the `grep` output, I send the header and the output into two different files, `header.csv` and `giants1985.csv`. Finally, I concatenate the two files with `cat`, and `cut` out unwanted columns (keeping columns 1-5 and 8-22).
+
+```bash
+$ head -1 Batting.csv > header.csv
+ $ grep SFN Batting.csv | grep 1985 > giants1985.csv
+ $ cat header.csv giants1985.csv | cut -d, -f -5,8-22 | column -s, -t
+playerID   yearID  stint  teamID  lgID  AB   R   H    2B  3B  HR  RBI  SB  CS  BB  SO   IBB  HBP  SH  SF
+adamsri02  1985    1      SFN     NL    121  12  23   3   1   2   10   1   1   5   23   3    1    3   0
+bluevi01   1985    1      SFN     NL    30   0   4    1   0   0   0    0   0   3   12   0    0    8   0
+brenlbo01  1985    1      SFN     NL    440  41  97   16  1   19  56   1   4   57  62   5    2    4   2
+brownch02  1985    1      SFN     NL    432  50  117  20  3   16  61   2   3   38  78   4    11   1   0
+davisch01  1985    1      SFN     NL    481  53  130  25  2   13  56   15  7   62  74   12   0    1   7
+davisma01  1985    1      SFN     NL    12   0   3    0   1   0   0    0   1   0   5    0    0    4   0
+deerro01   1985    1      SFN     NL    162  22  30   5   1   8   20   0   1   23  71   0    0    0   2
+driesda01  1985    2      SFN     NL    181  22  42   8   0   3   22   0   0   17  22   3    1    0   3
+garresc01  1985    1      SFN     NL    9    1   2    1   0   0   2    0   0   1   4    0    0    0   0
+gladdda01  1985    1      SFN     NL    502  64  122  15  8   7   41   32  15  40  78   1    7    10  2
+gottji01   1985    1      SFN     NL    51   6   10   2   0   3   3    0   1   1   30   0    0    4   0
+greenda03  1985    1      SFN     NL    294  36  73   10  2   5   20   6   5   22  58   3    1    2   2
+hammaat01  1985    1      SFN     NL    47   0   4    0   0   0   0    0   0   0   17   0    0    6   0
+jeffcmi01  1985    2      SFN     NL    1    0   0    0   0   0   0    0   0   1   0    0    0    0   0
+krukomi01  1985    1      SFN     NL    55   2   12   4   0   1   3    1   1   1   15   0    2    8   0
+kuipedu01  1985    1      SFN     NL    5    0   3    0   0   0   0    0   0   1   0    0    0    2   0
+lapoida01  1985    1      SFN     NL    60   4   10   1   0   0   6    0   0   6   11   0    0    5   0
+laskebi01  1985    1      SFN     NL    30   1   4    0   0   0   1    0   0   3   12   0    1    5   0
+lemasjo01  1985    1      SFN     NL    16   1   0    0   0   0   0    0   0   1   5    0    0    0   0
+leonaje01  1985    1      SFN     NL    507  49  122  20  3   17  62   11  6   21  107  5    1    1   1
+masonro01  1985    1      SFN     NL    11   1   1    0   0   0   0    0   0   0   5    0    1    0   0
+mintogr01  1985    1      SFN     NL    8    1   0    0   0   0   1    0   0   1   6    0    0    0   0
+moorebo01  1985    1      SFN     NL    2    0   0    0   0   0   0    0   0   0   0    0    0    0   0
+nokesma01  1985    1      SFN     NL    53   3   11   2   0   2   5    0   0   1   9    0    1    0   0
+rajsiga01  1985    1      SFN     NL    91   5   15   6   0   0   10   0   1   17  22   4    0    2   0
+robinje01  1985    1      SFN     NL    0    0   0    0   0   0   0    0   0   0   0    0    0    0   0
+roeniro01  1985    1      SFN     NL    133  23  34   9   1   3   13   6   2   35  27   3    0    1   1
+thompsc01  1985    1      SFN     NL    111  8   23   5   0   0   6    0   0   2   10   0    0    1   0
+trevial01  1985    1      SFN     NL    157  17  34   10  1   6   19   0   0   20  24   0    0    1   1
+trillma01  1985    1      SFN     NL    451  36  101  16  2   3   25   2   0   40  44   0    1    11  2
+uribejo01  1985    1      SFN     NL    476  46  113  20  4   3   26   8   2   30  57   8    2    5   0
+wardco01   1985    1      SFN     NL    2    0   0    0   0   0   0    0   0   0   1    0    0    0   0
+wellmbr01  1985    1      SFN     NL    174  16  41   11  1   0   16   5   2   4   33   1    4    5   1
+willifr01  1985    1      SFN     NL    3    0   0    0   0   0   0    0   0   0   0    0    0    1   0
+woodami01  1985    1      SFN     NL    82   12  20   1   0   0   9    6   1   5   3    0    0    1   0
+youngjo02  1985    1      SFN     NL    230  24  62   6   0   4   24   3   2   30  37   1    1    1   1
+```
+
+### Career Totals
+
+Since this data set has contains multiple entries for every player (every year they played), we need to aggregate the stats to find the career totals with `awk` arrays. Arrays in `awk` are tables with unique indices, so you can pass a column with multiple entries as its index and use `+` to sum duplicate entries. For example, `ab[$1]+=$9` takes the players as indices and sums duplicate entries of column 9, which is the "at bat" column. Finally, `awk` is then directed to step through the index of array `AB` and send the index `i`, `AB[i]` and `H[i]` to standard output in a whitespace separated format. Also note that the field separator command in `awk` is `-F`.
+
+```bash
+$ awk -F, '{AB[$1]+=$9;H[$1]+=$11} END {for (i in AB) print i,AB[i],H[i]}' Batting.csv > ABH.csv
+```
+
+What if I want to add more columns in after the fact?
+
+```bash
+$ awk -F, '{HR[$1]+=;RBI[$1]+=} END {for (i in HR) print i,HR[i],RBI[i]}' Batting.csv > HRBI.csv
+```
