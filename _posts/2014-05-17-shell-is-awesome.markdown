@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  "In awe of Shell"
+title:  "The Awesome Power of Shell"
 date:   2014-05-17 00:00:00
 categories: bash 
 ---
 
-Way back during one of my undergraduate astronomy data analysis courses, we briefly covered useful shell commands for searching and parsing data such as `grep`, `sed`, and `cut`. At the time I remember thinking that they looked very useful, but without practice I quickly reverted to more familiar and less efficient methods.
+Back during one of my undergraduate astronomy data analysis courses, we briefly covered useful shell commands for searching and parsing data such as `grep`, `sed`, and `cut`. At the time I remember thinking that they looked very useful, but without practice I quickly reverted to more familiar and less efficient methods.
 
-Fast forward to the week before I started the Zipfian Academy. In our pre-course work, we were tasked with parsing and performing preliminary analysis on New York nursing home bed census data using three different approaches: SQLite3, Python, and Shell. Between the three methods, Shell was by far the shortest and (arguably) most elegant solution. In order to demonstrate some super-useful shell commands, I will use two MLB data sets containing player batting data. 
+Fast forward to the week before I started the Zipfian Academy. In our pre-course work, we were tasked with parsing and performing preliminary analysis on New York nursing home bed census data using three different approaches: SQLite3, Python, and Shell. Between the three methods, Shell was by far the shortest and (arguably) most elegant solution. In order to demonstrate my point, I will use some super-useful shell commands on two MLB data sets containing player batting stats. 
 
 Shell scripting commands can be dense, so I will do my best to spell out each command in plain English.
 
@@ -15,7 +15,7 @@ Shell scripting commands can be dense, so I will do my best to spell out each co
 
 ### Converting between tab or space delimited format to a comma delimited format
 
-`stats.tsv` is currently delimited by whitespace of various lengths. This is not a very useful format. The following command uses `cat` to send all of `stats.tsv` to standard output, then pipe `|` that output to `sed -E`, which takes a "modern" regular expression that finds more than one whitespace `[[:space:]]+` and replaces it with a single comma. Finally, send the resulting output `>` to `stats.csv`.
+`stats.tsv` is currently delimited by whitespace of various lengths. This is not a very useful format. The following command uses `cat` to send all of `stats.tsv` to standard output, then pipe `|` that output to `sed -E`, which takes "extended" regular expressions that find more than one whitespace `[[:space:]]+` and replaces it with a single comma. Finally, send the resulting output `>` to `stats.csv`.
 
 ```bash
 $ cat stats.tsv | sed -E "s/[[:space:]]+/,/g" > stats.csv
@@ -26,15 +26,16 @@ $ cat stats.tsv | sed -E "s/[[:space:]]+/,/g" > stats.csv
 Show the top five rows of `stats.csv`, then use `column -s, -t` to tell shell to turn a comma delimited STDOUT into cleanly separated columns.
 
 ```bash
-$ head -5 stats.csv | column -s, -t
+$ head -6 stats.csv | column -s, -t
 RK  Last      F.  Team  Pos  G   AB   R   H   2B  3B  HR  RBI  BB  SO  SB  CS  AVG   OBP   SLG   OPS
 1   Bautista  J   TOR   RF   44  157  35  47  8   0   11  30   37  32  1   1   .299  .437  .561  .997
 2   Choo      S   TEX   LF   38  132  20  40  7   1   4   11   24  40  3   2   .303  .427  .462  .889
 3   Dunn      A   CWS   1B   34  114  14  29  7   0   6   15   27  39  1   0   .254  .399  .474  .872
 4   Napoli    M   BOS   1B   40  143  16  38  9   0   5   22   29  44  0   1   .266  .397  .434  .830
+5   Ortiz     D   BOS   DH   40  152  22  46  8   0   11  25   22  29  0   0   .303  .392  .572  .964
 ```
 
-### Count unique teams
+### Count unique teams with word count
 
 `tail +2 stats.csv` will output lines from row 2 to the end of `stats.csv`. In other words, `tail +2` outputs all lines except for the header. `cut -d,` will allow you to select fields from a comma delimited file and `-f4` tells cut to take the 4th column. Finally, `sort` the teams, perform `uniq` to remove similar adjacent lines, and use `wc -l` to count the lines.
 
@@ -59,16 +60,16 @@ $ grep OAK stats.csv | sort -n -t, -k18,18 -r | column -s, -t
 
 ## Baseball Batting History
 
-Switching gears, now let us look at a data set containing all MLB batters from 1871 to 2013. Many thanks to the [Lahman Baseball Database](http://www.opensourcesports.com/baseball/) for making the data easily accessible.
+Switching gears, let's look at a data set containing all MLB batters from 1871 to 2013. Many thanks to the [Lahman Baseball Database](http://www.opensourcesports.com/baseball/) for making the data easily accessible.
 
 ### Display batting stats from the 1985 San Francisco Giants
 
-This is easily done with chained `grep` commands. But first, in order to display the header along with the `grep` output, I send the header and the output into two different files, `header.csv` and `giants1985.csv`. Finally, I concatenate the two files with `cat`, and `cut` out unwanted columns (keeping columns 1-5 and 8-22).
+This is a large data set so let's get specific: how can I look up the player stats for the 1985 San Francisco Giants? This is easily done with chained `grep` commands. But first, in order to display the header along with the `grep` output, I send the header and the output into two different files, `header.csv` and `giants1985.csv`. Finally, I concatenate the two files with `cat`, and `cut` out unwanted columns (keeping columns 1-5 and 8-22).
 
 ```bash
 $ head -1 Batting.csv > header.csv
- $ grep SFN Batting.csv | grep 1985 > giants1985.csv
- $ cat header.csv giants1985.csv | cut -d, -f -5,8-22 | column -s, -t
+$ grep SFN Batting.csv | grep 1985 > giants1985.csv
+$ cat header.csv giants1985.csv | cut -d, -f -5,8-22 | column -s, -t
 playerID   yearID  stint  teamID  lgID  AB   R   H    2B  3B  HR  RBI  SB  CS  BB  SO   IBB  HBP  SH  SF
 adamsri02  1985    1      SFN     NL    121  12  23   3   1   2   10   1   1   5   23   3    1    3   0
 bluevi01   1985    1      SFN     NL    30   0   4    1   0   0   0    0   0   3   12   0    0    8   0
@@ -108,16 +109,76 @@ woodami01  1985    1      SFN     NL    82   12  20   1   0   0   9    6   1   5
 youngjo02  1985    1      SFN     NL    230  24  62   6   0   4   24   3   2   30  37   1    1    1   1
 ```
 
-### Career Totals
+### Total Career Hits
 
-Since this data set has contains multiple entries for every player (every year they played), we need to aggregate the stats to find the career totals with `awk` arrays. Arrays in `awk` are tables with unique indices, so you can pass a column with multiple entries as its index and use `+` to sum duplicate entries. For example, `ab[$1]+=$9` takes the players as indices and sums duplicate entries of column 9, which is the "at bat" column. Finally, `awk` is then directed to step through the index of array `AB` and send the index `i`, `AB[i]` and `H[i]` to standard output in a whitespace separated format. Also note that the field separator command in `awk` is `-F`.
-
-```bash
-$ awk -F, '{AB[$1]+=$9;H[$1]+=$11} END {for (i in AB) print i,AB[i],H[i]}' Batting.csv > ABH.csv
-```
-
-What if I want to add more columns in after the fact?
+Since this data set contains multiple entries/rows for every player (every year they played), we need to aggregate their stats by year to come up with career hit totals. This can easily be done with `awk` arrays. Arrays in `awk` are tables with unique indices, so you can pass a column as its index and use `++` to count rows with the same index or `+=$col` to sum a particular column on rows with the same index. In the command below, `p[$1]++` creates an array that uses column 1 (playerID) as its index, then counts the number of duplicate index entries. This basically computes the length of a players career. `H[$1]+=10` is an array indexed by playerID, whose value is the sum of column 10 (Hits) for each playerID. Finally, the statement starting with `for (i in p)` prints the player_ID, career length, and hit total in CSV format for every player_ID. Also note that the field separator switch in `awk` is `-F`.
 
 ```bash
-$ awk -F, '{HR[$1]+=;RBI[$1]+=} END {for (i in HR) print i,HR[i],RBI[i]}' Batting.csv > HRBI.csv
+$ awk -F, '{p[$1]++;H[$1]+=$10} END {for (i in p) print i","p[i]","H[i]}' Batting.csv > H.csv
 ```
+
+### All-time greatest hitters
+
+A reverse sort on field 3 is all that is needed here. As expected, we see Pete Rose, Ty Cobb, Hank Aaron, Stan Musial, and Tris Speaker. Comparing these to [Baseball-Reference](http://www.baseball-reference.com/leaders/H_career.shtml), I noticed that I over-counted Pete Rose's career length by one year. A quick `grep` on rosepe01 confirmed that he has two entries for 1984 because he switched from Montreal to Cincinnati mid-season.
+
+```bash
+$ sort -n -t, -r -k3,3 H.csv | head -5 | column -s, -t
+rosepe01   25  4256
+cobbty01   24  4189
+aaronha01  23  3771
+musiast01  22  3630
+speaktr01  22  3514
+```
+
+### Batting Averages
+
+Now suppose I want to compute batting averages and add them as a column in `H.csv`. This can be done with another `awk` command, much like the one above. Then, use `join` to merge the two data sets on the first field, player_ID. Note that the `awk` command's if-else statement avoids an arithmetic error by printing `0.00` if a player has a year with zero "at bats".
+
+```bash
+$ awk -F, '{AB[$1]+=$8;H[$1]+=$10} END {for (i in H) if (AB[i] != 0) print i","H[i]/AB[i]; else print i",0.00"}' Batting.csv > AVG.csv
+$ join -t, H.csv AVG.csv > HAVG.csv
+```
+
+Now repeat the above search showing the greatest hitters.
+
+```bash
+sort -n -t, -r -k3,3 HAVG.csv | head -5 | column -s, -t
+rosepe01   25  4256  0.302853
+cobbty01   24  4189  0.366363
+aaronha01  23  3771  0.304998
+musiast01  22  3630  0.330842
+speaktr01  22  3514  0.344679
+```
+
+### The Great Bambino
+
+The Sultan of Swat.
+
+```bash
+$ grep ruthba Batting.csv > greatbambino.csv
+$ cat header.csv greatbambino.csv | cut -d, -f 1,2,4,5,8-14 | column -s, -t
+playerID  yearID  teamID  lgID  AB   R    H    2B  3B  HR  RBI
+ruthba01  1914    BOS     AL    10   1    2    1   0   0   2
+ruthba01  1915    BOS     AL    92   16   29   10  1   4   21
+ruthba01  1916    BOS     AL    136  18   37   5   3   3   15
+ruthba01  1917    BOS     AL    123  14   40   6   3   2   12
+ruthba01  1918    BOS     AL    317  50   95   26  11  11  66
+ruthba01  1919    BOS     AL    432  103  139  34  12  29  114
+ruthba01  1920    NYA     AL    457  158  172  36  9   54  137
+ruthba01  1921    NYA     AL    540  177  204  44  16  59  171
+ruthba01  1922    NYA     AL    406  94   128  24  8   35  99
+ruthba01  1923    NYA     AL    522  151  205  45  13  41  131
+ruthba01  1924    NYA     AL    529  143  200  39  7   46  121
+ruthba01  1925    NYA     AL    359  61   104  12  2   25  66
+ruthba01  1926    NYA     AL    495  139  184  30  5   47  150
+ruthba01  1927    NYA     AL    540  158  192  29  8   60  164
+ruthba01  1928    NYA     AL    536  163  173  29  8   54  142
+ruthba01  1929    NYA     AL    499  121  172  26  6   46  154
+ruthba01  1930    NYA     AL    518  150  186  28  9   49  153
+ruthba01  1931    NYA     AL    534  149  199  31  3   46  163
+ruthba01  1932    NYA     AL    457  120  156  13  5   41  137
+ruthba01  1933    NYA     AL    459  97   138  21  3   34  103
+ruthba01  1934    NYA     AL    365  78   105  17  4   22  84
+ruthba01  1935    BSN     NL    72   13   13   0   0   6   12
+```
+
