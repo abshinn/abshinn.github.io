@@ -1,5 +1,6 @@
 ---
 layout: post
+comments: true
 title:  "The Sultan of Awk"
 date:   2014-05-17 00:00:00
 categories: bash 
@@ -60,7 +61,7 @@ $ grep OAK stats.csv | sort -n -t, -k18,18 -r | column -s, -t
 
 ## Baseball Batting History
 
-Switching gears, let's look at a data set containing all MLB batters from 1871 to 2013. Many thanks to the [Lahman Baseball Database](http://www.opensourcesports.com/baseball/) for making the data easily accessible.
+Switching gears, let's look at a data set containing all MLB batters from 1871 to 2013. [Many thanks](http://seanlahman.com/support/) to the [Lahman Baseball Database](http://www.opensourcesports.com/baseball/) for making the data easily accessible.
 
 ### Display batting stats from the 1985 San Francisco Giants
 
@@ -197,6 +198,10 @@ $ grep ruthba HAVG.csv | column -s, -t
 ruthba01  22  2873  0.342105
 ```
 
-### Why not just use Pandas?
+### Why don't you just use Pandas?
 
 Yes, [Pandas](http://pandas.pydata.org/) or [R](http://www.r-project.org/) can do all of the above data manipulation and *so much more*. Why use `awk`ward and opaque shell commands? Because they are efficient, built-in, and fantastic for simple data exploration and manipulation.
+
+
+
+___
