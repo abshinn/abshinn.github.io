@@ -1,15 +1,15 @@
 ---
 layout: post
-title:  "The Awesome Power of Shell"
+title:  "The Sultan of Awk"
 date:   2014-05-17 00:00:00
 categories: bash 
 ---
 
-Back during one of my undergraduate astronomy data analysis courses, we briefly covered useful shell commands for searching and parsing data such as `grep`, `sed`, and `cut`. At the time I remember thinking that they looked very useful, but without practice I quickly reverted to more familiar and less efficient methods.
+Back during one of my undergraduate astronomy data analysis courses, we briefly covered useful shell commands for searching and parsing data such as `grep`, `sed`, `cut`, and `awk`. At the time I remember thinking that they looked very useful, but without practice I quickly reverted to more familiar and less efficient methods.
 
 Fast forward to the week before I started the Zipfian Academy. In our pre-course work, we were tasked with parsing and performing preliminary analysis on New York nursing home bed census data using three different approaches: SQLite3, Python, and Shell. Between the three methods, Shell was by far the shortest and (arguably) most elegant solution. In order to demonstrate my point, I will use some super-useful shell commands on two MLB data sets containing player batting stats. 
 
-Shell scripting commands can be dense, so I will do my best to spell out each command in plain English.
+Shell scripting commands can be dense, so I will do my best to spell out each command in the plainest English.
 
 ## Current American League Batting Stats
 
@@ -68,7 +68,11 @@ This is a large data set so let's get specific: how can I look up the player sta
 
 ```bash
 $ head -1 Batting.csv > header.csv
+```
+```bash
 $ grep SFN Batting.csv | grep 1985 > giants1985.csv
+```
+```bash
 $ cat header.csv giants1985.csv | cut -d, -f -5,8-22 | column -s, -t
 playerID   yearID  stint  teamID  lgID  AB   R   H    2B  3B  HR  RBI  SB  CS  BB  SO   IBB  HBP  SH  SF
 adamsri02  1985    1      SFN     NL    121  12  23   3   1   2   10   1   1   5   23   3    1    3   0
@@ -111,7 +115,7 @@ youngjo02  1985    1      SFN     NL    230  24  62   6   0   4   24   3   2   3
 
 ### Total Career Hits
 
-Since this data set contains multiple entries/rows for every player (every year they played), we need to aggregate their stats by year to come up with career hit totals. This can easily be done with `awk` arrays. Arrays in `awk` are tables with unique indices, so you can pass a column as its index and use `++` to count rows with the same index or `+=$col` to sum a particular column on rows with the same index. In the command below, `p[$1]++` creates an array that uses column 1 (playerID) as its index, then counts the number of duplicate index entries. This basically computes the length of a players career. `H[$1]+=10` is an array indexed by playerID, whose value is the sum of column 10 (Hits) for each playerID. Finally, the statement starting with `for (i in p)` prints the player_ID, career length, and hit total in CSV format for every player_ID. Also note that the field separator switch in `awk` is `-F`.
+Since this data set contains multiple entries/rows for every player (every year they played), we need to aggregate their stats by year to come up with career hit totals. This can easily be done with `awk` arrays. Arrays in `awk` are tables with unique indices, so you can pass a column as its index and use `++` to count rows with the same index or `+=$col` to sum a particular column on rows with the same index. In the command below, `p[$1]++` creates an array that uses column 1 (playerID) as its index, then counts the number of duplicate index entries. This basically computes the length of a players career. `H[$1]+=10` is an array indexed by playerID, whose value is the sum of column 10 (Hits) for each playerID. Finally, the statement starting with `for (i in p)` prints the playerID, career length, and hit total in CSV format for every playerID. Also note that the field separator switch in `awk` is `-F`.
 
 ```bash
 $ awk -F, '{p[$1]++;H[$1]+=$10} END {for (i in p) print i","p[i]","H[i]}' Batting.csv > H.csv
@@ -132,17 +136,19 @@ speaktr01  22  3514
 
 ### Batting Averages
 
-Now suppose I want to compute batting averages and add them as a column in `H.csv`. This can be done with another `awk` command, much like the one above. Then, use `join` to merge the two data sets on the first field, player_ID. Note that the `awk` command's if-else statement avoids an arithmetic error by printing `0.00` if a player has a year with zero "at bats".
+Now suppose I want to compute batting averages and add them as a column in `H.csv`. This can be done with another `awk` command, much like the one above. Then, use `join` to merge the two data sets on the first field, playerID. Note that the `awk` command's if-else statement avoids an arithmetic error by printing `0.00` if a player has zero "at bats".
 
 ```bash
 $ awk -F, '{AB[$1]+=$8;H[$1]+=$10} END {for (i in H) if (AB[i] != 0) print i","H[i]/AB[i]; else print i",0.00"}' Batting.csv > AVG.csv
+```
+```bash
 $ join -t, H.csv AVG.csv > HAVG.csv
 ```
 
 Now repeat the above search showing the greatest hitters.
 
 ```bash
-sort -n -t, -r -k3,3 HAVG.csv | head -5 | column -s, -t
+$ sort -n -t, -r -k3,3 HAVG.csv | head -5 | column -s, -t
 rosepe01   25  4256  0.302853
 cobbty01   24  4189  0.366363
 aaronha01  23  3771  0.304998
@@ -152,10 +158,12 @@ speaktr01  22  3514  0.344679
 
 ### The Great Bambino
 
-The Sultan of Swat.
+Let's do a search for The Sultan of Swat. Since I know playerIDs start with the last name followed by the first two letters of their first name, I will do a `grep` on "ruthba". Sure enough, George Herman Ruth Junior comes up. In order to display his stats with column names, I will first save the `grep` search to its own file then `cat` the header and Babe's stats together. Again, I use to `cut` to be picky about which columns to view, and then `column` for its fancy formatting.
 
 ```bash
 $ grep ruthba Batting.csv > greatbambino.csv
+```
+```bash
 $ cat header.csv greatbambino.csv | cut -d, -f 1,2,4,5,8-14 | column -s, -t
 playerID  yearID  teamID  lgID  AB   R    H    2B  3B  HR  RBI
 ruthba01  1914    BOS     AL    10   1    2    1   0   0   2
@@ -182,3 +190,13 @@ ruthba01  1934    NYA     AL    365  78   105  17  4   22  84
 ruthba01  1935    BSN     NL    72   13   13   0   0   6   12
 ```
 
+How about the Colossus of Clout's career totals?
+
+```bash
+$ grep ruthba HAVG.csv | column -s, -t
+ruthba01  22  2873  0.342105
+```
+
+### Why not just use Pandas?
+
+Yes, [Pandas](http://pandas.pydata.org/) or [R](http://www.r-project.org/) can do all of the above data manipulation and *so much more*. Why use `awk`ward and opaque shell commands? Because they are efficient, built-in, and fantastic for simple data exploration and manipulation.
