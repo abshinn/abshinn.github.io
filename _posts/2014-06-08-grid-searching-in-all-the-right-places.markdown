@@ -67,7 +67,7 @@ if __name__ == "__main__":
     pprint(parameters)
     t0 = dt.now()
     grid_search.fit(xtrain, ytrain)
-    print("done in {}\n".format(dt.now - t0))
+    print("done in {}\n".format(dt.now() - t0))
 ```
 
 ### Well, what now?
