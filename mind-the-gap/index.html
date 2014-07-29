@@ -61,6 +61,53 @@ body {
 #tbody tr:nth-child(odd) {
   background: #eee;
 }
+
+div.tooltip {   
+  position: absolute;           
+  text-align: left;           
+  width: 200px;                  
+  height: 200px;                 
+  padding: 4px;             
+  line-height: 1;
+  font: normal medium/1.4 sans-serif;        
+  color: white;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;           
+  pointer-events: none;         
+}
+/*
+  border: 2px solid white;      
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+ Creates a small triangle extender for the tooltip
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+ Style northward tooltips differently 
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+*/
+
 </style>
 <body>
 <div id="title" style="background-color:#FFA500;height:150px;width:1000px;float:left;background:url(mind-the-gap-header-01.jpg);background-size:1000px 150px;"></div>
@@ -69,6 +116,8 @@ body {
 
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.0.0.js"></script>
+<!-- <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script> -->
 <script>
 
 var width = 550,
@@ -93,6 +142,18 @@ svg.append("rect")
    .on("click", clicked);
 
 var g = svg.append("g");
+
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
+// var tip = d3.tip()
+//   .attr('class', 'd3-tip')
+//   .offset([-10, 0])
+//   .html(function(d) {
+//     console.log(d);
+//     return "<strong>Frequency:</strong> <span style='color:red'>" + d.ST + "</span>";
+//   });
 
 d3.json("json/states_usa.topo.json", function(error, us) {
    g.append("g")
@@ -130,14 +191,23 @@ function draw_districts(state) {
         // class set to name of district with spaces removed
         .attr("class", function(d) { district_arr.push(d.properties); return d.properties.name.replace(/\s/g, "") })
         .attr("d", path.pointRadius(2))
+        .attr('fill-opacity', 0.8)
         .on("mouseover", function(d){ 
+             console.log(d.properties);
                 d3.select(this)
                   .transition()
                   .duration(400)
                   .ease("back-out")
                   .attr("d", path.pointRadius(4));
                 d3.selectAll("."+d.properties.name.replace(/\s/g, ""))
-                  .style("background-color", "lightblue"); })  
+                  .style("background-color", "lightblue");
+//                div.transition()        
+//                   .duration(200)      
+//                   .style("opacity", .9);      
+//                div.html(d.properties.info)  
+//                   .style("left", (d3.event.pageX - 213) + "px")     
+//                   .style("top", (d3.event.pageY - 213) + "px");    
+                 })  
         .on("mouseout", function(d) { 
                 d3.select(this)
                   .transition()
@@ -145,7 +215,11 @@ function draw_districts(state) {
                   .ease("back-out")
                   .attr("d", path.pointRadius(2));
                 d3.selectAll("."+d.properties.name.replace(/\s/g, ""))
-                  .style("background-color", "white"); });
+                  .style("background-color", "white"); 
+//                div.transition()        
+//                  .duration(500)      
+//                  .style("opacity", 0); 
+                });
 
       draw_table(district_arr, state);
     });
@@ -153,14 +227,18 @@ function draw_districts(state) {
 
 // remove columns from table
 function columns(obj) {
+    console.log("DELETE");
       delete obj["leaid"]
       delete obj["state"]
+      delete obj["info"]
       return obj;
 }
 
 function draw_table(district_arr, state) {
 
-    district_arr.filter(columns)
+    var table_arr = Object(district_arr);
+    jQuery.extend(table_arr, district_arr);
+    table_arr.filter(columns);
 
     // header
     d3.select("#table").selectAll("th")
@@ -170,7 +248,7 @@ function draw_table(district_arr, state) {
 
     // rows
     var tr = d3.select("#table").selectAll("tr")
-      .data(district_arr).enter().append("tr").attr("class", function(d){ return d.name.replace(/\s/g, ""); })
+      .data(table_arr).enter().append("tr").attr("class", function(d){ return d.name.replace(/\s/g, ""); })
       .on("mouseover", function(d){
               d3.select(this).style("background-color", "lightblue");
               d3.selectAll("."+d.name.replace(/\s/g, ""))
