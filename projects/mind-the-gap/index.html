@@ -114,8 +114,6 @@ d3.json("json/states_usa.topo.json", function(error, us) {
     .attr("d", path);
 });
 
-g.append("g").attr("class", "stable").attr("transform","translate(850,0)");
-
 
 function draw_districts(state) {
     state_name = state.properties.name;
@@ -151,7 +149,7 @@ function draw_districts(state) {
                   .style("opacity", .9);      
                div.html(d.properties.info)
                   .style("left", "10px")     
-                  .style("top", "160px");    
+                  .style("top", "130px");    
                  })  
         .on("mouseout", function(d) { 
                 d3.select(this)
