@@ -164,7 +164,7 @@ function draw_districts(state) {
                  .style("opacity", 0); 
                 });
 
-      draw_table(district_arr, state);
+      draw_table(district_arr);
     });
 }
 
@@ -177,7 +177,7 @@ function columns(obj) {
       return obj;
 }
 
-function draw_table(district_arr, state) {
+function draw_table(district_arr) {
    
     var table_arr = jQuery.extend(true, [], district_arr);
     table_arr.filter(columns);
