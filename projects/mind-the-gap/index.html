@@ -123,6 +123,7 @@ function draw_districts(state) {
         .data(topojson.feature(us, us.objects.districts).features.filter(function(d) { return state_name == d.properties.state }))
         .enter()
         .append("path")
+        .attr("id", "district")
 
         // class set to name of district with spaces removed
         .attr("class", function(d) { 
