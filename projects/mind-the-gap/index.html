@@ -78,12 +78,11 @@ var projection = d3.geo.albersUsa()
     .scale(690)
     .translate([width/2, height/2 - 50]);
 
-var path = d3.geo.path()
-    .projection(projection);
+var path = d3.geo.path().projection(projection);
 
 var svg = d3.select("#map").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+            .attr("width", width)
+            .attr("height", height);
 
 svg.append("rect")
    .attr("class", "background")
@@ -96,8 +95,6 @@ var g = svg.append("g");
 var div = d3.select("body").append("div")   
     .attr("class", "tooltip")               
     .style("opacity", 0);
-
-var tooltip_translate = 250;
 
 d3.json("json/states_usa.topo.json", function(error, us) {
    g.append("g")
@@ -123,25 +120,24 @@ function draw_districts(state) {
     d3.json("json/districts.topo.json", function(error, us) {
        g.append("g")
         .selectAll("path")
-        .data(topojson.feature(us, us.objects.districts).features.filter(function(d) { return state_name == d.properties.state; }))
+        .data(topojson.feature(us, us.objects.districts).features.filter(function(d) { return state_name == d.properties.state }))
         .enter()
         .append("path")
-        .attr("id", "district")
 
         // class set to name of district with spaces removed
         .attr("class", function(d) { 
             district_arr.push(d.properties); 
-            return d.properties.name.replace(/\s/g, "") })
+            return "l"+d.properties.leaid })
         .attr("d", path.pointRadius(2))
-        .attr('fill-opacity', 0.5)
+        .attr("fill-opacity", 0.5)
 
         .on("mouseover", function(d){ 
                 d3.select(this)
                   .transition()
-                  .duration(500)
+                  .duration(700)
                   .ease("back-out")
-                  .attr("d", path.pointRadius(4));
-                d3.selectAll("."+d.properties.name.replace(/\s/g, ""))
+                  .attr("d", path.pointRadius(4.5));
+                d3.selectAll(".l"+d.properties.leaid)
                   .style("background-color", "lightblue");
                div.transition()        
                   .duration(500)      
@@ -153,14 +149,14 @@ function draw_districts(state) {
         .on("mouseout", function(d) { 
                 d3.select(this)
                   .transition()
-                  .duration(500)
+                  .duration(700)
                   .ease("back-out")
                   .attr("d", path.pointRadius(2));
-                d3.selectAll("."+d.properties.name.replace(/\s/g, ""))
+                d3.selectAll(".l"+d.properties.leaid)
                   .style("background-color", "white"); 
                div.transition()        
-                 .duration(500)      
-                 .style("opacity", 0); 
+                  .duration(500)      
+                  .style("opacity", 0); 
                 });
 
       draw_table(district_arr);
@@ -188,14 +184,14 @@ function draw_table(district_arr) {
 
     // rows
     var tr = d3.select("#table").selectAll("tr")
-      .data(table_arr).enter().append("tr").attr("class", function(d){ return d.name.replace(/\s/g, ""); })
+      .data(table_arr).enter().append("tr").attr("class", function(d, index){ return "l"+district_arr[index].leaid })
       .on("mouseover", function(d, index){
               d3.select(this).style("background-color", "lightblue");
-              d3.selectAll("."+d.name.replace(/\s/g, ""))
+              d3.selectAll(".l"+district_arr[index].leaid)
                 .transition()
                 .ease("back-out")
-                .duration(500)
-                .attr("d", path.pointRadius(4));
+                .duration(700)
+                .attr("d", path.pointRadius(4.5));
              div.transition()        
                 .duration(500)      
                 .style("opacity", .9);      
@@ -203,12 +199,12 @@ function draw_table(district_arr) {
                 .style("left", "10px")     
                 .style("top", "160px");    
                  })  
-      .on("mouseout", function(d){
+      .on("mouseout", function(d, index){
               d3.select(this).style("background-color", "white");
-              d3.selectAll("."+d.name.replace(/\s/g, ""))
+              d3.selectAll(".l"+district_arr[index].leaid)
                 .transition()
                 .ease("back-out")
-                .duration(500)
+                .duration(700)
                 .attr("d", path.pointRadius(2));
              div.transition()        
                 .duration(500)      
