@@ -264,7 +264,7 @@ dev.off()
 
 **Output:**
 
-![Magnitude over Time]({{ site.url }}/assets/SF-LA_timeVmag.png)
+![Magnitude over Time]({{ site.url }}/images/SF-LA_timeVmag.png)
 
 The major earthquakes that pop out in this plot are: Landers in 1992, Loma Prieta in 1989, and Northridge at the beginning of 1994. What is also interesting is the amount of aftershocks and related earthquakes for the major Los Angeles area earthquakes. Another interesting aspect of this plot is the increased detection efficiency of 2 to 2.5 magnitude earthquakes since 2009. Perhaps this is due to the [Quake-Catcher Network (QCN)](http://qcn.stanford.edu/wp-content/uploads/2011/10/2009-Cochran_et_al_IEEE_QCN_smaller.pdf)?
 
@@ -291,6 +291,6 @@ dev.off()
 
 **Output:**
 
-![Magnitude versus Frequency]({{ site.url }}/assets/SF-LA_magVfreq.png)
+![Magnitude versus Frequency]({{ site.url }}/images/SF-LA_magVfreq.png)
 
 The correlation between magnitude and frequency for most of the Richter scale has a slope of about 10^1 events over one order of magnitude. Furthermore, as the magnitude increases, the spread of the data increases due to the insufficient amount of counts. 
