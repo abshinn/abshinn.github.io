@@ -6,18 +6,17 @@ date:   2014-08-18 00:00:00
 categories: R
 ---
 
-# California Earthquakes with R 
+I decided to do a bit of data exploration around major California earthquakes in the last 30 years. Specifically, I will look at earthquakes within 200 km of San Francisco and Los Angeles.
+
+USGS has a very accessible Earthquake API and [online query form](http://earthquake.usgs.gov/earthquakes/search/). I wrote a [simple script](http://github.com/abshinn/usgs/) in Python3 which queries the API and downloads the result.
+
+## Data preparation
 
 ### Fetching the data 
 
-As an example of how to use the Python USGS Earthquake API wrapper, I decided to do a bit of data exploration around major California earthquakes in the last 30 years. Specifically, I will look at earthquakes within 200 km of San Francisco and Los Angeles.
-
-To pull down the data using Python3, I first navigate to the usgs home directory, and call the APIquery with the desired parameters. All parameters are [defined here](http://comcat.cr.usgs.gov/fdsnws/event/1/) and an online query form can be [found here](http://earthquake.usgs.gov/earthquakes/search/).
+To pull down the data, use [usgs.APIquery](http://github.com/abshinn/usgs/) with the desired parameters. All parameters are [defined here](http://comcat.cr.usgs.gov/fdsnws/event/1/).
 
 ```python
-import sys
-sys.path.append("../code")
-
 import usgs
 
 # obtain data for the greater San Francisco area, 1983 through 2012
@@ -235,7 +234,6 @@ I am not an expert in seismology. However, my guess would be that this magnitude
 Time for some plots. Let's have a look at the following correlations:
 
 - time vs. magnitude
-- year vs. event count
 - magnitude-frequency correlation
 
 Load ggplot2 and scales. The scales package is necessary for log tick marks.
@@ -270,33 +268,6 @@ dev.off()
 
 The major earthquakes that pop out in this plot are: Landers in 1992, Loma Prieta in 1989, and Northridge at the beginning of 1994. What is also interesting is the amount of aftershocks and related earthquakes for the major Los Angeles area earthquakes. Another interesting aspect of this plot is the increased detection efficiency of 2 to 2.5 magnitude earthquakes since 2009. Perhaps this is due to the [Quake-Catcher Network (QCN)](http://qcn.stanford.edu/wp-content/uploads/2011/10/2009-Cochran_et_al_IEEE_QCN_smaller.pdf)?
 
-### year vs. event count
-
-```R
-png("SF-LA_yrVcount.png", width = 1000, height = 800)
-yrVcount = ggplot(na.omit(quakes), aes(yearbins)) +
-           geom_bar(aes(fill = Mvariedbins), color = "black") +
-           ggtitle("SF and LA Earthquakes, 1983-2012") +
-           xlab("year") +
-           ylab("event count") + 
-           guides(fill = guide_legend(title = "magnitude")) +
-           scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-                         labels = trans_format("log10", math_format(10^.x))) +
-           scale_fill_brewer(palette = 'BuPu') + 
-           scale_x_discrete("year", breaks = c(as.character(seq(1985,2010,5)))) +
-           theme_grey(base_size = 12) +
-           theme(text = element_text(size = 22)) +
-           facet_wrap(~ area, ncol = 1)
-print(yrVcount)
-dev.off()
-```
-
-**Output:**
-
-![alt text](https://github.com/abshinn/usgs/blob/master/exploration/SF-LA_yrVcount.png "Year Count")
-
-This is a cleaner way of looking at the magnitude size distribution per year. This plot also shows the increased detection efficiency for low-magnitude earthquakes in recent years. Also, it is interesting how the major LA earthquakes seemingly increased the events per year by about 10^4.
-
 ### magnitude-frequency correlation
 
 ```R
@@ -322,4 +293,4 @@ dev.off()
 
 ![alt text](https://github.com/abshinn/usgs/blob/master/exploration/SF-LA_magVfreq.png "Magnitude versus Frequency")
 
-The correlation between magnitude and frequency for most of the Richter scale has a slope of about 10^1 events over one order of magnitude. Also, as expected, when the magnitude increases, the spread of the data increases due to the insufficient amount of counts. As mentioned in the above section, I am not certain, but I believe the decreasing amount of event counts from magnitude 3.0 to 2.0 is due to detection efficiency of low-magnitude earthquakes, and theoretically, should increase as the magnitude approaches 0.
+The correlation between magnitude and frequency for most of the Richter scale has a slope of about 10^1 events over one order of magnitude. Furthermore, as the magnitude increases, the spread of the data increases due to the insufficient amount of counts. 
