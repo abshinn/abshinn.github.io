@@ -6,7 +6,7 @@ date:   2014-08-18 00:00:00
 categories: R
 ---
 
-_Update: The 6.0 Napa earthquake occured a week after I originally published this post. I re-ran the code and analysis to include the new quake._
+_Update: The 6.0 Napa earthquake occured a week after I originally published this post. I re-ran the code and analysis to include the latest activity._
 
 I decided to do a bit of data exploration around major California earthquakes in the last 30 years. Specifically, I will look at earthquakes within 200 km of San Francisco and Los Angeles between August 1984 and August 2014.
 
@@ -123,7 +123,7 @@ quakes = quakes[order(quakes$mag, decreasing = TRUE),] # sort by magnitude
 print(quakes[quakes$mag >= 6.0,c("ptime", "mag", "area", "Etnt", "dist")])
 ```
 
-**Output (with annotation):**
+_Output (with annotation):_
 
 ```R
                     ptime mag area       Etnt      dist
@@ -148,7 +148,7 @@ Since epicenter location is a huge factor in the destructive power of an earthqu
 print(aggregate(data = quakes, cbind(dist, mag, Etnt) ~ area, mean))
 ```
 
-**Output:**
+_Output:_
 
 ```R
   area     dist      mag      Etnt
@@ -165,7 +165,7 @@ The question of which city has been more affected is more complex than a simple 
 print(aggregate(data = quakes, cbind(dist, mag, Etnt) ~ yearbins, mean))
 ```
 
-**Output:**
+_Output:_
 
 ```R
 yearbins      dist      mag         Etnt
@@ -216,7 +216,7 @@ names(freqLA) = c("magLA", "freqLA")
 print(cbind(freqSF, freqLA))
 ```
 
-**Output:**
+_Output:_
 
 ```R
      magSF freqSF   magLA freqLA
@@ -270,7 +270,7 @@ print(timeVmag)
 dev.off()
 ```
 
-**Output:**
+_Output:_
 
 ![Magnitude over Time]({{ site.url }}/images/SF-LA_timeVmag.png)
 
@@ -297,8 +297,14 @@ print(magVfreq)
 dev.off()
 ```
 
-**Output:**
+_Output:_
 
 ![Magnitude versus Frequency]({{ site.url }}/images/SF-LA_magVfreq.png)
 
 The correlation between magnitude and frequency for most of the Richter scale has a slope of about 10^1 events over one order of magnitude. Furthermore, as the magnitude increases, the spread of the data increases due to the insufficient amount of counts. 
+
+## Code available on Github
+
+The code for this post can be found under the exploration directory on github in my [usgs](http://github.com/abshinn/usgs) repository: [quakes.R](https://github.com/abshinn/usgs/tree/master/exploration/quakes.R)
+
+Many thanks to [usgs.gov](http://www.usgs.gov) for providing easy access to their earthquake data.
