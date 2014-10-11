@@ -3,7 +3,7 @@ layout: post
 comments: true
 title:  "Using combineByKey in Apache-Spark"
 date:   2014-10-11 00:00:00
-categories: python, apache-spark
+categories: python apache-spark
 ---
 
 Aggregating data is a fairly straight-forward task, but what if you are working with a distributed data set, one that does not fit in local memory? 
@@ -15,9 +15,9 @@ In this post I am going to make use of key-value pairs and [Apache-Spark](https:
 
 The example below uses data in the form of a list of tuples in the form: `(key, value)`. I turn that list into a [Resilient Distributed Dataset (RDD)](http://www.thecloudavenue.com/2014/01/resilient-distributed-datasets-rdd.html) with `sc.parallelize`, where `sc` is an instance of `pyspark.SparkContext`.
 
-The next step is to use `combineByKey` to compute the sum and count for each key in `data`. Admittedly, using three lambda-functions as arguments to `combineByKey` does not yield the most readable code. I will explain each lambda-function in the next section. The result, `sumCount`, is an RDD where its values are in the form of `(label, (sum, count))`.
+The next step is to use `combineByKey` to compute the sum and count for each key in `data`. Admittedly, using three lambda-functions as arguments to `combineByKey` makes the code difficult to read. I will explain each lambda-function in the next section. The result, `sumCount`, is an RDD where its values are in the form of `(label, (sum, count))`.
 
-To compute the average-by-key, I use the `map` method to divide the sum by the count for each key. 
+To compute the average-by-key, I use the `map` method to divide the sum by the count for each key.
 
 Finally, I use the `collectAsMap` method to return the average-by-key as a dictionary.
 
@@ -58,7 +58,7 @@ In order to aggregate an RDD's elements in parallel, Spark's `combineByKey` meth
 lambda value: (value, 1)
 ```
 
-The first required argument in the `combineByKey` method is a function to be used as the very first aggregation step for each key. The argument of this function corresponds to the value in a key-value pair. If we want to compute the sum and count using `combineByKey`, then we can create this "combiner" to be a tuple in the form of `(sum, count)`. The very first step in `(sum, count)` is then `(value, 1)`, where `value` is the first RDD value that `combineByKey` comes across and `1` initializes the count.
+The first required argument in the `combineByKey` method is a function to be used as the very first aggregation step for each key. The argument of this function corresponds to the value in a key-value pair. If we want to compute the sum and count using `combineByKey`, then we can create this "combiner" to be a tuple in the form of `(sum, count)`. The very first step in this aggregation is then `(value, 1)`, where `value` is the first RDD value that `combineByKey` comes across and `1` initializes the count.
 
 
 #### Merge a Value
