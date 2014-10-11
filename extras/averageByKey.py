@@ -8,9 +8,9 @@ if __name__ == "__main__":
 
     data = sc.parallelize( [(0, 2.), (0, 4.), (1, 0.), (1, 10.), (1, 20.)] )
 
-    sumCount = data.combineByKey(lambda x: (x, 1),
-                                 lambda t, value: (t[0] + value, t[1] + 1),
-                                 lambda t, u: (t[0] + u[0], t[1] + u[1]))
+    sumCount = data.combineByKey(lambda value: (value, 1),
+                                 lambda x, value: (x[0] + value, x[1] + 1),
+                                 lambda x, y: (x[0] + y[0], x[1] + y[1]))
 
     averageByKey = sumCount.map(lambda (label, (value_sum, count)): (label, value_sum / count))
 
