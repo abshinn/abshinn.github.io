@@ -8,14 +8,14 @@ categories: python, apache-spark
 
 Aggregating data is a fairly straight-forward task, but what if you are working with a distributed data set, one that does not fit in local memory? 
 
-In this post I am going to make use of key-value pairs and [Apache-Spark](https://spark.apache.org/)'s `combineByKey` method to compute the average-by-key. Aggregating-by-key may seem like a trivial task, but it happens to play a major role in the implementation of algorithms such as KMeans, Naive Bayes, and TF-IDF. More importantly, implementing algorithms such as these in a distributed framework such as Spark is an invaluable skill to have.
+In this post I am going to make use of key-value pairs and [Apache-Spark](https://spark.apache.org/)'s `combineByKey` method to compute the average-by-key. Aggregating-by-key may seem like a trivial task, but it happens to play a major role in the implementation of algorithms such as KMeans, Naive Bayes, and TF-IDF. More importantly, implementing algorithms in a distributed framework such as Spark is an invaluable skill to have.
 
 
 ### Average By Key
 
-The example below uses data in the form of a list of tuples in the form: `(key, value)`. I turn that list into a [Resilient Distributed Dataset (RDD)](http://www.thecloudavenue.com/2014/01/resilient-distributed-datasets-rdd.html) with the `sc.parallelize` function, where `sc` is an instance of `pyspark.SparkContext`.
+The example below uses data in the form of a list of tuples in the form: `(key, value)`. I turn that list into a [Resilient Distributed Dataset (RDD)](http://www.thecloudavenue.com/2014/01/resilient-distributed-datasets-rdd.html) with `sc.parallelize`, where `sc` is an instance of `pyspark.SparkContext`.
 
-The next step is to use the `combineByKey` method, which is admittedly not very readable with its three lambda-function parameters. I will explain each lambda-function in the next section. The result, `sumCount`, is an RDD where its values are in the form of `(label, (sum, count))`.
+The next step is to use `combineByKey` to compute the sum and count for each key in `data`. Admittedly, using three lambda-functions as arguments to `combineByKey` does not yield the most readable code. I will explain each lambda-function in the next section. The result, `sumCount`, is an RDD where its values are in the form of `(label, (sum, count))`.
 
 To compute the average-by-key, I use the `map` method to divide the sum by the count for each key. 
 
@@ -34,7 +34,7 @@ averageByKey = sumCount.map(lambda (label, (value_sum, count)): (label, value_su
 print averageByKey.collectAsMap()
 ```
 
-__Result:__
+_Result:_
 
 ```python
 {0: 3.0, 1: 10.0}
@@ -43,7 +43,7 @@ __Result:__
 [See here](https://github.com/abshinn/abshinn.github.io/tree/master/extras/averageByKey.py) for the above example as an executable script.
 
 
-### `combineByKey` Method
+### The combineByKey Method
 
 In order to aggregate an RDD's elements in parallel, Spark's `combineByKey` method requires three functions:
 
@@ -93,6 +93,7 @@ Note: I do not use `sum` as variable name in the code because it is a built-in f
 ### Learn More
 
 To learn more about Spark and programming with key-value pairs in Spark, see:
+
 - [Spark Documentation Overview](http://spark.apache.org/documentation.html) 
 - [Spark Programming Guide](http://spark.apache.org/docs/latest/programming-guide.html)
 - [O'Reilly: Learning Spark, Chapter 4](https://www.safaribooksonline.com/library/view/learning-spark/9781449359034/ch04.html)
