@@ -101,4 +101,4 @@ To learn more about Spark and programming with key-value pairs in Spark, see:
 
 For an example of using the above calculation in a PySpark implementation of KMeans, see:
 
-- [sparkmeans.py: Lloyd's Algorithm in PySpark](https://github.com/abshinn/practice/blob/master/machinelearning/sparkmeans.py)
+- [Lloyd's Algorithm in PySpark: sparkmeans.py](https://github.com/abshinn/practice/blob/master/machinelearning/sparkmeans.py)
