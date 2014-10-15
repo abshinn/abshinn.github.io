@@ -13,7 +13,7 @@ In this post I am going to make use of key-value pairs and [Apache-Spark](https:
 
 ### Average By Key
 
-The example below uses data in the form of a list of tuples in the form: `(key, value)`. I turn that list into a [Resilient Distributed Dataset (RDD)](http://www.thecloudavenue.com/2014/01/resilient-distributed-datasets-rdd.html) with `sc.parallelize`, where `sc` is an instance of `pyspark.SparkContext`.
+The example below uses data in the form of a list of key-value tuples: `(key, value)`. I turn that list into a [Resilient Distributed Dataset (RDD)](http://www.thecloudavenue.com/2014/01/resilient-distributed-datasets-rdd.html) with `sc.parallelize`, where `sc` is an instance of `pyspark.SparkContext`.
 
 The next step is to use `combineByKey` to compute the sum and count for each key in `data`. Admittedly, using three lambda-functions as arguments to `combineByKey` makes the code difficult to read. I will explain each lambda-function in the next section. The result, `sumCount`, is an RDD where its values are in the form of `(label, (sum, count))`.
 
@@ -99,3 +99,6 @@ To learn more about Spark and programming with key-value pairs in Spark, see:
 - [O'Reilly: Learning Spark, Chapter 4](https://www.safaribooksonline.com/library/view/learning-spark/9781449359034/ch04.html)
 - [PySpark Documentation](http://spark.apache.org/docs/latest/api/python/index.html)
 
+For an example of using the above calculation in a PySpark implementation of KMeans, see:
+
+- [sparkmeans.py: Lloyd's Algorithm in PySpark](https://github.com/abshinn/practice/blob/master/machinelearning/sparkmeans.py)
