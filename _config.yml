@@ -7,6 +7,5 @@ baseurl: ""
 url: "http://abshinn.github.io"
 
 # Build settings
-# markdown: kramdown
-markdown: redcarpet
+markdown: kramdown
 permalink: pretty
